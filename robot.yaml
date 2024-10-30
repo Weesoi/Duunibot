@@ -2,8 +2,8 @@
 # https://github.com/robocorp/rcc/blob/master/docs/recipes.md#what-is-in-robotyaml
 
 tasks:
-  Run all tasks:
-    shell: python -m robot --report NONE --outputdir output --logtitle "Task log" tasks.robot
+  Run Task:
+    shell: python -m robocorp.tasks run tasks.py
 
 environmentConfigs:
   - environment_windows_amd64_freeze.yaml
@@ -11,7 +11,7 @@ environmentConfigs:
   - environment_darwin_amd64_freeze.yaml
   - conda.yaml
 
-artifactsDir: output  
+artifactsDir: output
 
 PATH:
   - .
