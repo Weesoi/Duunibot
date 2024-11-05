@@ -1,12 +1,19 @@
 *** Settings ***
-Library    SeleniumLibrary
+Library    RPA.Browser.Selenium    auto_close=${False}
 
-*** Variables ***
-${URL}    https://www.duunitori.fi
+*** Tasks ***
+Avaa verkkosivu
+    Open Duunitori Website
 
-*** Test Cases ***
+Hakusanat
+    Lisää hakusanat
+
+*** Keywords ***
 Open Duunitori Website
-    [Documentation]    This test opens the Duunitori website and verifies the title
-    Open Browser    ${URL}    Chrome
-    Maximize Browser Window
-    [Teardown]    Close Browser
+    Open Available Browser    https://www.duunitori.fi
+
+Lisää hakusanat
+    Delete All Cookies
+    Click Element When Visible    xpath://button[text()='Hyväksy evästeet']
+    Input Text    css:form__input form__input--fake form__input--border form__input--icon js-nav-toggle-search    It
+    Input Text    css:taggle_input    Pääkaupunkiseutu
