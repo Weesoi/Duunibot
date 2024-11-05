@@ -8,6 +8,9 @@ Avaa verkkosivu
 Hakusanat
     Lisää hakusanat
 
+Testi Screenshot
+    Avaa hakemukset ja ota screenshot 
+
 
 *** Variables ***
 ${SCREENSHOT_PATH}    ./output/screenshots-duunitori/screenshot.png
