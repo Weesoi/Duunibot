@@ -13,8 +13,9 @@ Testi Screenshot
 
 
 *** Variables ***
-${SCREENSHOT_PATH}    ./output/screenshots-duunitori/screenshot.png
-
+${SCREENSHOT_PATH-DUUNITORI}    ./output/screenshots-duunitori/screenshot.png
+${SCREENSHOT_PATH-JOBLY}
+${SCREENSHOT_PATH-OIKOTIE}
 
 *** Keywords ***
 Open Duunitori Website
@@ -36,6 +37,7 @@ Lisää hakusanat
 
 
 Avaa hakemukset ja ota screenshot 
-    Capture Page Screenshot    ${SCREENSHOT_PATH}
-
+#lisää tähän for-loop 
+    Capture Page Screenshot    ${SCREENSHOT_PATH-DUUNITORI}
+#<----->
 
