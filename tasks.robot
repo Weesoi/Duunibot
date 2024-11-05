@@ -8,6 +8,11 @@ Avaa verkkosivu
 Hakusanat
     Lisää hakusanat
 
+
+*** Variables ***
+${SCREENSHOT_PATH}    ./output/screenshots-duunitori/screenshot.png
+
+
 *** Keywords ***
 Open Duunitori Website
     Open Available Browser    https://www.duunitori.fi
@@ -26,5 +31,8 @@ Lisää hakusanat
     Click Element    js-form__search--submit 
     Execute JavaScript    document.evaluate("//button[contains(text(), 'Uusimmat')]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();
 
+
+Avaa hakemukset ja ota screenshot 
+    Capture Page Screenshot    ${SCREENSHOT_PATH}
 
 
