@@ -24,5 +24,7 @@ Lisää hakusanat
     Press Keys    css:.taggle_input    TAB
     Press Keys    None    Pääkaupunkiseutu   
     Click Element    js-form__search--submit 
-    Click Element    xpath://button[text()='Järjestä']
+    Execute JavaScript    document.evaluate("//button[contains(text(), 'Uusimmat')]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();
+
+
 
