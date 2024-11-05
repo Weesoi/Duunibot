@@ -15,5 +15,5 @@ Open Duunitori Website
 Lisää hakusanat
     Delete All Cookies
     Click Element When Visible    xpath://button[text()='Hyväksy evästeet']
-    Input Text     xpath://div[@class='form__input form__input--fake form__input--border form__input--icon js-nav-toggle-search']    It   It
-    Input Text    css:.taggle_input    Pääkaupunkiseutu
+    Execute JavaScript    var element = document.querySelector("div.form__input.form__input--fake.form__input--border.form__input--icon.js-nav-toggle-search"); element.innerText = "It"; element.dispatchEvent(new Event('input', { bubbles: true }));
+    Input Text    css:.taggle_input    IT
