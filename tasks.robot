@@ -1,5 +1,7 @@
 *** Settings ***
 Library    RPA.Browser.Selenium    auto_close=${False}
+Library    Collections
+Library    RPA.Tables
 
 *** Tasks ***
 Avaa verkkosivu
@@ -9,6 +11,8 @@ Hakusanat
     Lisää hakusanat
 
 Testi Screenshot
+    Avaa hakemukset ja ota screenshot 
+Haeppas niitä röitä
     Avaa hakemukset ja ota screenshot 
 
 
@@ -20,6 +24,7 @@ ${SCREENSHOT_PATH-OIKOTIE}
 *** Keywords ***
 Open Duunitori Website
     Open Available Browser    https://www.duunitori.fi
+    Maximize Browser Window    # Make the browser window full screen
 
 Lisää hakusanat
     Delete All Cookies
@@ -37,7 +42,20 @@ Lisää hakusanat
 
 
 Avaa hakemukset ja ota screenshot 
-#lisää tähän for-loop 
-    Capture Page Screenshot    ${SCREENSHOT_PATH-DUUNITORI}
-#<----->
+    Wait Until Element Is Visible    xpath://a[contains(@class, 'job-box__hover')]
+    ${job_elements}=    Get WebElements    xpath://a[contains(@class, 'job-box__hover') and contains(@class, 'gtm-search-result')]
+    
+    FOR    ${index}    IN RANGE    0    20
+        ${job_element}=    Get From List    ${job_elements}    ${index}
+        Scroll Element Into View    ${job_element}
+        Click Element    ${job_element}
+        Sleep    1s    # Optional: pause for a moment between clicks
+        
+        # Dynamically create the screenshot path with an incrementing number
+        ${screenshot_path}=    Set Variable    ./output/screenshots-duunitori/screenshot_${index + 1}.png
+        Capture Page Screenshot    ${screenshot_path}
+        
+        Go Back    # Return to the job list page
+    END
+
 
