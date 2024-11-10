@@ -57,9 +57,9 @@ Avaa hakemukset ja ota screenshot
         Wait Until Element Is Visible    ${job_element}
         Sleep    2s    # Adjust if necessary
 
-        # Click the element and wait for page load
+        # Click the element and wait for page load, piti lisätä 5 sekunttia että isokuvaisimmat sivut kerkeävät lataamaan
         Click Element    ${job_element}
-        Sleep    2s
+        Sleep    5s
 
         # Set the window to full page height for capturing the full page screenshot
         ${original_size}=    Get Window Size
