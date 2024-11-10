@@ -69,6 +69,8 @@ Avaa hakemukset ja ota screenshot
         # Take a full page screenshot with a unique filename
         ${screenshot_path}=    Set Variable    ./output/screenshots-duunitori/screenshot_${index + 1}.png
         Capture Page Screenshot    ${screenshot_path}
+        
+# tähän tulee h1 url kerääminen 
 
         # Revert window size after the screenshot
         Set Window Size    ${original_size}[0]    ${original_size}[1]
