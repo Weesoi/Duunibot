@@ -90,16 +90,17 @@ Avaa hakemukset ja ota screenshot
 Kokoa PDF
     [Arguments]    ${job_data}
 
-    ${html_content}=    Set Variable    <html><body><h1>Job Listings Information</h1>
+    ${html_content}=    Set Variable    <html><body><h1>Duunitorin 20 uusinta ilmoitusta:</h1>
 
     FOR    ${job}    IN    @{job_data}
         ${url}=    Get From Dictionary    ${job}    url
         ${full_screenshot}=    Get From Dictionary    ${job}    full_screenshot
         ${title_screenshot}=    Get From Dictionary    ${job}    title_screenshot
-
-        ${html_content}=    Set Variable    ${html_content}<h2>Job Listing</h2><p>URL: <a href="${url}">${url}</a></p>
-        ${html_content}=    Set Variable    ${html_content}<h3>Full Page Screenshot</h3><img src="${full_screenshot}" width="600" height="800"><br>
-        ${html_content}=    Set Variable    ${html_content}<h3>Title Screenshot</h3><img src="${title_screenshot}" width="600" height="200"><br>
+        
+        ${html_content}=    Set Variable    ${html_content}<html><body><h1>Hakemus tiedot:</h1>
+        ${html_content}=    Set Variable    ${html_content}<p>URL: <a href="${url}">${url}</a></p>
+        ${html_content}=    Set Variable    ${html_content}<img src="${full_screenshot}" width="500" height="300"><br>
+        ${html_content}=    Set Variable    ${html_content}<img src="${title_screenshot}" width="200" height="60"><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
     END
 
     ${html_content}=    Set Variable    ${html_content}</body></html>
