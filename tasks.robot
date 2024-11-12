@@ -11,7 +11,6 @@ ${PDF_FILE}                       ${BASE_OUTPUT_DIRECTORY}/pdf/website_info.pdf
 ${SCREENSHOT_DIRECTORY}           ${BASE_OUTPUT_DIRECTORY}
 ${TITLE_SCREENSHOT_DIRECTORY}     ${BASE_OUTPUT_DIRECTORY}/titles
 ${PDF_DIRECTORY}                  ${BASE_OUTPUT_DIRECTORY}/pdf
-${MAX_RETRIES}                    3    # Max retries per job listing in case of errors
 
 *** Tasks ***
 Avaa verkkosivu ja tallenna työilmoitukset PDF-tiedostoon
@@ -80,6 +79,7 @@ Avaa hakemukset ja ota screenshot
         Append To List    ${job_data}    ${job_entry}
 
         Set Window Size    ${original_size}[0]    ${original_size}[1]
+        #go back komento ei täysin toimi, ja se aiheuttaakin ongelmia koko koodin toimivuudessa
         Go Back
         Wait Until Element Is Visible    xpath://a[contains(@class, 'job-box__hover')]
         Sleep    2s
@@ -105,4 +105,4 @@ Kokoa PDF
 
     ${html_content}=    Set Variable    ${html_content}</body></html>
     HTML To PDF    ${html_content}    ${PDF_FILE}
-    Log To Console    Website information has been saved to ${PDF_FILE}
+    Log To Console    Tiedot on tallennu nyt tiedostoon: ${PDF_FILE}
