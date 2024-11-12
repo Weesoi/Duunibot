@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 6.1.1 (Python 3.10.14 on win32)" generated="20241105 10:12:51.251" rpa="false" schemaversion="4">
+<robot generator="Robot 6.1.1 (Python 3.10.14 on win32)" generated="20241112 16:39:52.692" rpa="false" schemaversion="4">
 <suite id="s1" name="Robot Interactive Console" source="c:\Users\sokri\.vscode\extensions\robocorp.robotframework-lsp-1.13.0\src\robotframework_ls\vendored\robotframework_interactive\robot_interactive_console.robot">
 <test id="s1-t1" name="Default Task/Test" line="5">
 <kw name="Interpreter Main Loop" library="MainLoop">
+<kw name="Open Duunitori Website">
+<msg timestamp="20241112 16:39:53.455" level="FAIL">No keyword with name 'Open Duunitori Website' found.</msg>
+<status status="FAIL" starttime="20241112 16:39:53.454" endtime="20241112 16:39:53.455"/>
+</kw>
 <kw name="Lisää hakusanat">
-<msg timestamp="20241105 10:12:52.260" level="FAIL">No keyword with name 'Lisää hakusanat' found.</msg>
-<status status="FAIL" starttime="20241105 10:12:52.260" endtime="20241105 10:12:52.260"/>
+<status status="NOT RUN" starttime="20241112 16:39:53.456" endtime="20241112 16:39:53.456"/>
 </kw>
-<status status="PASS" starttime="20241105 10:12:51.272" endtime="20241105 10:12:58.173"/>
+<kw name="Avaa hakemukset ja ota screenshot">
+<var>${job_data}</var>
+<status status="NOT RUN" starttime="20241112 16:39:53.458" endtime="20241112 16:39:53.459"/>
 </kw>
-<status status="PASS" starttime="20241105 10:12:51.272" endtime="20241105 10:12:58.173"/>
+<kw name="Kokoa PDF">
+<arg>${job_data}</arg>
+<status status="NOT RUN" starttime="20241112 16:39:53.461" endtime="20241112 16:39:53.461"/>
+</kw>
+<status status="PASS" starttime="20241112 16:39:52.734" endtime="20241112 16:39:56.059"/>
+</kw>
+<status status="PASS" starttime="20241112 16:39:52.733" endtime="20241112 16:39:56.060"/>
 </test>
-<status status="PASS" starttime="20241105 10:12:51.253" endtime="20241105 10:12:58.174"/>
+<status status="PASS" starttime="20241112 16:39:52.695" endtime="20241112 16:39:56.062"/>
 </suite>
 <statistics>
 <total>

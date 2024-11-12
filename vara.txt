@@ -1,0 +1,280 @@
+*** Settings ***
+Library    RPA.Browser.Selenium    auto_close=${False}
+Library    Collections
+Library    RPA.Tables
+Library    RPA.PDF
+Library    OperatingSystem
+
+*** Variables ***
+${PDF_FILE}                      ./output/screenshots-duunitori/pdf/website_info.pdf
+${SCREENSHOT_DIRECTORY}          ./output/screenshots-duunitori
+${TITLE_SCREENSHOT_DIRECTORY}    ./output/screenshots-duunitori/titles
+${PDF_DIRECTORY}                 ./output/screenshots-duunitori/pdf
+${MAX_RETRIES}                   3    # Max retries per job listing in case of errors
+
+*** Tasks ***
+Avaa verkkosivu ja tallenna työilmoitukset PDF-tiedostoon
+    Open Duunitori Website
+    Lisää hakusanat
+    ${job_data}=    Avaa hakemukset ja ota screenshot 
+    Kokoa PDF    ${job_data}
+
+*** Keywords ***
+Open Duunitori Website
+    Open Available Browser    https://www.duunitori.fi
+    Maximize Browser Window
+
+Lisää hakusanat
+    Delete All Cookies
+    Click Element When Visible    xpath://button[text()='Hyväksy evästeet']
+    Execute JavaScript    var element = document.querySelector("div.form__input.form__input--fake.form__input--border.form__input--icon.js-nav-toggle-search"); element.innerText = "It"; element.dispatchEvent(new Event('input', { bubbles: true }));
+    Input Text    css:.taggle_input    IT 
+    Press Keys    css:.taggle_input    TAB
+    Input Text    css:.taggle_input    designer
+    Press Keys    css:.taggle_input    TAB
+    Input Text    css:.taggle_input    developer
+    Press Keys    css:.taggle_input    TAB
+    Press Keys    None    Pääkaupunkiseutu   
+    Click Element    js-form__search--submit 
+    Execute JavaScript    document.evaluate("//button[contains(text(), 'Uusimmat')]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();
+
+Avaa hakemukset ja ota screenshot
+    ${job_data}=    Create List
+    Wait Until Element Is Visible    xpath://a[contains(@class, 'job-box__hover')]
+    ${job_elements}=    Get WebElements    xpath://a[contains(@class, 'job-box__hover') and contains(@class, 'gtm-search-result')]
+
+    FOR    ${index}    IN RANGE    0    20
+        ${job_elements}=    Get WebElements    xpath://a[contains(@class, 'job-box__hover') and contains(@class, 'gtm-search-result')]
+        Exit For Loop If    ${index} >= ${job_elements.__len__()}
+        ${job_element}=    Get From List    ${job_elements}    ${index}
+        
+        Scroll Element Into View    ${job_element}
+        Wait Until Element Is Visible    ${job_element}
+        Sleep    2s
+
+        # Click the job listing and handle loading
+        Click Element    ${job_element}
+        Sleep    5s
+
+        # Set the window to full page height
+        ${original_size}=    Get Window Size
+        ${total_height}=    Execute JavaScript    return document.body.scrollHeight
+        Set Window Size    ${original_size}[0]    ${total_height}
+        Sleep    5s
+
+        # Capture full page screenshot
+        ${screenshot_path}=    Set Variable    ${SCREENSHOT_DIRECTORY}/full_screenshot_${index + 1}.png
+        Capture Page Screenshot    ${screenshot_path}
+        ${screenshot_exists}=    Run Keyword And Return Status    File Should Exist    ${screenshot_path}
+        
+        # Log and continue if screenshot is missing
+        Run Keyword If    '${screenshot_exists}' == 'FAIL'    Log To Console    "Failed to capture full page screenshot for listing ${index + 1}, skipping."    AND    Continue For Loop
+
+        # Capture the <h1> title element screenshot
+        Wait Until Element Is Visible    xpath://h1
+        ${title_screenshot_path}=    Set Variable    ${TITLE_SCREENSHOT_DIRECTORY}/title_screenshot_${index + 1}.png
+        Capture Element Screenshot    xpath://h1    ${title_screenshot_path}
+        ${title_screenshot_exists}=    Run Keyword And Return Status    File Should Exist    ${title_screenshot_path}
+
+        # Log and continue if title screenshot is missing
+        Run Keyword If    '${title_screenshot_exists}' == 'FAIL'    Log To Console    "Failed to capture title screenshot for listing ${index + 1}, skipping."    AND    Continue For Loop
+
+        # Get the current URL
+        ${current_url}=    Get Location
+        ${job_entry}=    Create Dictionary    url=${current_url}    full_screenshot=${screenshot_path}    title_screenshot=${title_screenshot_path}
+        Append To List    ${job_data}    ${job_entry}
+
+        # Revert window size after the screenshot
+        Set Window Size    ${original_size}[0]    ${original_size}[1]
+        Sleep    5s
+
+        # Navigate back to the job list
+        Go Back
+        Wait Until Element Is Visible    xpath://a[contains(@class, 'job-box__hover')]
+        Sleep    2s
+    END
+
+    # Return the collected job data
+    [Return]    ${job_data}
+
+Kokoa PDF
+    [Arguments]    ${job_data}
+
+    # Initialize HTML content for PDF
+    ${html_content}=    Set Variable    <html><body><h1>Job Listings Information</h1>
+
+    # Loop through each job entry and add it to the HTML content
+    FOR    ${job}    IN    @{job_data}
+        ${url}=    Get From Dictionary    ${job}    url
+        ${full_screenshot}=    Get From Dictionary    ${job}    full_screenshot
+        ${title_screenshot}=    Get From Dictionary    ${job}    title_screenshot
+
+        ${html_content}=    Set Variable    ${html_content}<h2>Job Listing</h2><p>URL: <a href="${url}">${url}</a></p>
+        ${html_content}=    Set Variable    ${html_content}<h3>Full Page Screenshot</h3><img src="${full_screenshot}" width="600" height="800"><br>
+        ${html_content}=    Set Variable    ${html_content}<h3>Title Screenshot</h3><img src="${title_screenshot}" width="600" height="200"><br>
+    END
+
+    ${html_content}=    Set Variable    ${html_content}</body></html>
+
+    Log To Console    "Generating PDF at path: ${PDF_FILE}"
+    HTML To PDF    ${html_content}    ${PDF_FILE}
+
+    Log To Console    Website information has been saved to ${PDF_FILE}
+
+
+
+
+
+    file ongelmat:
+
+
+
+    *** Settings ***
+Library    RPA.Browser.Selenium    auto_close=${False}
+Library    Collections
+Library    RPA.Tables
+Library    RPA.PDF
+Library    OperatingSystem
+Library    BuiltIn
+
+*** Variables ***
+${SCREENSHOT_DIRECTORY}          ./screenshots-duunitori
+${PDF_DIRECTORY}                 ./output/screenshots-duunitori/pdf
+${PDF_FILE}                      ${PDF_DIRECTORY}/job_listings.pdf
+
+*** Tasks ***
+Avaa verkkosivu ja tallenna työilmoitukset PDF-tiedostoon
+    # Ensure directories exist
+    Create Directory    ${SCREENSHOT_DIRECTORY}
+    Create Directory    ${PDF_DIRECTORY}
+    
+    Open Duunitori Website
+    Lisää hakusanat
+    ${job_data}=    Avaa hakemukset ja ota screenshot 
+    Kokoa PDF    ${job_data}
+
+*** Keywords ***
+
+Convert Image To Base64
+    [Arguments]    ${image_path}
+    ${image_data}=    Get File    ${image_path}    binary=True
+    ${base64_data}=    Evaluate    import base64; base64.b64encode(${image_data}).decode('utf-8')    modules=base64
+    [Return]    ${base64_data}
+
+
+Open Duunitori Website
+    Open Available Browser    https://www.duunitori.fi
+    Maximize Browser Window
+
+Lisää hakusanat
+    Delete All Cookies
+    Click Element When Visible    xpath://button[text()='Hyväksy evästeet']
+    Execute JavaScript    var element = document.querySelector("div.form__input.form__input--fake.form__input--border.form__input--icon.js-nav-toggle-search"); element.innerText = "It"; element.dispatchEvent(new Event('input', { bubbles: true }));
+    Input Text    css:.taggle_input    IT 
+    Press Keys    css:.taggle_input    TAB
+    Input Text    css:.taggle_input    designer
+    Press Keys    css:.taggle_input    TAB
+    Input Text    css:.taggle_input    developer
+    Press Keys    css:.taggle_input    TAB
+    Press Keys    None    Pääkaupunkiseutu   
+    Click Element    js-form__search--submit 
+    Execute JavaScript    document.evaluate("//button[contains(text(), 'Uusimmat')]", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();
+
+Avaa hakemukset ja ota screenshot
+    ${job_data}=    Create List
+    Wait Until Element Is Visible    xpath://a[contains(@class, 'job-box__hover')]
+    ${job_elements}=    Get WebElements    xpath://a[contains(@class, 'job-box__hover') and contains(@class, 'gtm-search-result')]
+
+    FOR    ${index}    IN RANGE    0    20
+        # Re-fetch the list of job elements to avoid stale references
+        ${job_elements}=    Get WebElements    xpath://a[contains(@class, 'job-box__hover') and contains(@class, 'gtm-search-result')]
+
+        # Ensure there are enough elements
+        Exit For Loop If    ${index} >= ${job_elements.__len__()}
+
+        ${job_element}=    Get From List    ${job_elements}    ${index}
+        
+        # Scroll to the element and wait until it is clickable
+        Scroll Element Into View    ${job_element}
+        Wait Until Element Is Visible    ${job_element}
+        Sleep    2s    # Adjust if necessary
+
+        # Click the element and wait for page load
+        Click Element    ${job_element}
+        Sleep    5s
+
+        # Set the window to full page height for capturing the full page screenshot
+        ${original_size}=    Get Window Size
+        ${total_height}=    Execute JavaScript    return document.body.scrollHeight
+        Set Window Size    ${original_size}[0]    ${total_height}
+
+        # Take a full page screenshot with a unique filename
+        ${screenshot_path}=    Set Variable    ${SCREENSHOT_DIRECTORY}/full_screenshot_${index + 1}.png
+        Capture Page Screenshot    ${screenshot_path}
+        File Should Exist    ${screenshot_path}    # Ensure the screenshot was saved
+
+        # Get the current URL
+        ${current_url}=    Get Location
+        ${job_entry}=    Create Dictionary    url=${current_url}    screenshot=${screenshot_path}
+        Append To List    ${job_data}    ${job_entry}
+
+        # Revert window size after the screenshot
+        Set Window Size    ${original_size}[0]    ${original_size}[1]
+        Sleep    7s
+
+        # Navigate back to the job list with retry mechanism
+        Navigate Back With Retry
+
+    END
+    [Return]    ${job_data}
+
+Navigate Back With Retry
+    ${max_retries}=    Set Variable    7    # Set maximum retry attempts
+    ${attempt}=        Set Variable    0
+
+    FOR    ${attempt}    IN RANGE    ${max_retries}
+        Go Back
+        Sleep    2s
+        ${element_visible}=    Run Keyword And Return Status    Wait Until Element Is Visible    xpath://a[contains(@class, 'job-box__hover')]    timeout=5s
+        IF    ${element_visible}
+            Log    Successfully navigated back on attempt ${attempt + 1}
+            Exit For Loop
+        ELSE
+            Log    Attempt ${attempt + 1} to go back failed, retrying...
+            Sleep    2s
+        END
+    END
+
+    # If it still doesn't see the element after max retries, log a warning
+    Run Keyword If    not ${element_visible}    Log To Console    "WARNING: Could not return to the job list after ${max_retries} attempts."
+
+
+Kokoa PDF
+    [Arguments]    ${job_data}
+
+    # Initialize HTML content for PDF
+    ${html_content}=    Set Variable    <html><body><h1>Job Listings Information</h1>
+
+    # Loop through each job entry and add it to the HTML content
+    FOR    ${job}    IN    @{job_data}
+        ${url}=    Get From Dictionary    ${job}    url
+        ${screenshot}=    Get From Dictionary    ${job}    screenshot
+
+        # Convert images to base64
+        ${screenshot_base64}=    Convert Image To Base64    ${screenshot}
+
+        # Embed images in HTML content with base64 data
+        ${html_content}=    Set Variable    ${html_content}<h2>Job Listing</h2><p>URL: <a href="${url}">${url}</a></p>
+        ${html_content}=    Set Variable    ${html_content}<h3>Full Page Screenshot</h3><img src="data:image/png;base64,${screenshot_base64}" width="600" height="800"><br>
+    END
+
+    ${html_content}=    Set Variable    ${html_content}</body></html>
+
+    # Ensure PDF directory exists
+    Create Directory    ${PDF_DIRECTORY}
+
+    Log To Console    "Generating PDF at path: ${PDF_FILE}"
+    HTML To PDF    ${html_content}    ${PDF_FILE}
+
+    Log To Console    "Website information has been saved to ${PDF_FILE}"
+
